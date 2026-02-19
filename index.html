@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animated Colorful Calendar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
+            70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
+            100% { transform: scale(1.15); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+        }
+        
+        @keyframes ripple {
+            0% { transform: scale(0.8); opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+        
+        .fade-out {
+            animation: fadeOut 0.3s ease-out forwards;
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            transition: opacity 0.3s ease;
+        }
+        
+        .calendar-day {
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(145deg, #f0f9ff, #e0f2fe);
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            color: #1e40af;
+            font-weight: 600;
+        }
+        
+        .calendar-day.weekend {
+            background: linear-gradient(145deg, #fef2f2, #fecaca);
+            color: #dc2626;
+            font-weight: 700;
+        }
+        
+        /* Holiday styling */
+        .calendar-day.holiday {
+            background: linear-gradient(145deg, #fee2e2, #fecaca);
+            color: #b91c1c;
+            font-weight: 700;
+            border: 2px solid #ef4444;
+        }
+        
+        /* Weekend + Holiday combination */
+        .calendar-day.weekend.holiday {
+            background: linear-gradient(145deg, #fecaca, #f87171);
+            color: #7f1d1d;
+            border: 2px solid #dc2626;
+        }
+        
+        .calendar-day.prev-month {
+            background: linear-gradient(145deg, #f3f4f6, #e5e7eb);
+            color: #9ca3af;
+        }
+        
+        .calendar-day::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(59, 130, 246, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.4s, height 0.4s;
+        }
+        
+        .calendar-day:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+            z-index: 10;
+        }
+        
+        .calendar-day.weekend:hover {
+            transform: scale(1.12);
+            box-shadow: 0 6px 12px rgba(220, 38, 38, 0.3);
+        }
+        
+        .calendar-day.holiday:hover {
+            transform: scale(1.12);
+            box-shadow: 0 6px 12px rgba(220, 38, 38, 0.4);
+        }
+        
+        .calendar-day.selected {
+            background: linear-gradient(145deg, #3b82f6, #2563eb);
+            color: white;
+            animation: bounce 0.5s ease;
+            transform: scale(1.15);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.6);
+            z-index: 20;
+        }
+        
+        .calendar-day.weekend.selected {
+            background: linear-gradient(145deg, #dc2626, #b91c1c);
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.6);
+        }
+        
+        .calendar-day.holiday.selected {
+            background: linear-gradient(145deg, #dc2626, #b91c1c);
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.6);
+        }
+        
+        .calendar-day.today {
+            background: linear-gradient(145deg, #10b981, #059669);
+            color: white;
+            font-weight: 700;
+            box-shadow: 0 0 0 2px white, 0 0 0 4px #10b981;
+        }
+        
+        .calendar-day.today.selected {
+            background: linear-gradient(145deg, #059669, #047857);
+        }
+        
+        .calendar-day.selected::before {
+            width: 300%;
+            height: 300%;
+        }
+        
+        .calendar-day.clicked::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: ripple 0.6s ease-out;
+        }
+        
+        .nav-button {
+            transition: all 0.2s ease;
+        }
+        
+        .nav-button:hover {
+            transform: scale(1.15);
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .nav-button:active {
+            transform: scale(0.95);
+        }
+        
+        .month-transition {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .week-header {
+            font-weight: 700;
+            color: #4f46e5;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.1);
+        }
+        
+        .weekend-header {
+            color: #dc2626;
+        }
+        
+        /* Enhanced Tooltip styling */
+        .tooltip {
+            position: fixed;
+            z-index: 1000;
+            background: linear-gradient(135deg, #1f2937, #111827);
+            color: white;
+            text-align: center;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            pointer-events: none;
+            white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+            opacity: 0;
+            transform: translate(-50%, -10px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            max-width: 200px;
+            word-wrap: break-word;
+        }
+        
+        .tooltip.show {
+            opacity: 1;
+            transform: translate(-50%, 0);
+        }
+        
+        .tooltip::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -6px;
+            border-width: 6px;
+            border-style: solid;
+            border-color: #1f2937 transparent transparent transparent;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 640px) {
+            .tooltip {
+                max-width: 150px;
+                font-size: 12px;
+                padding: 8px 12px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-50 to-purple-100 min-h-screen flex items-center justify-center p-4">
+    <div class="max-w-md w-full bg-white rounded-2xl shadow-xl overflow-hidden transition-all duration-300 hover:shadow-2xl">
+        <div class="bg-gradient-to-r from-indigo-500 to-purple-600 p-6 text-white">
+            <h1 class="text-2xl font-bold text-center mb-4">Colorful Calendar</h1>
+            <div class="flex items-center justify-between">
+                <button id="prev-month" class="nav-button bg-white bg-opacity-20 rounded-full p-2 transition-all duration-200 hover:bg-opacity-30">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <h2 id="current-month" class="text-xl font-semibold"></h2>
+                <button id="next-month" class="nav-button bg-white bg-opacity-20 rounded-full p-2 transition-all duration-200 hover:bg-opacity-30">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="p-6">
+            <div class="grid grid-cols-7 gap-1 mb-2">
+                <div class="text-center py-2 text-sm week-header">Sun</div>
+                <div class="text-center py-2 text-sm week-header">Mon</div>
+                <div class="text-center py-2 text-sm week-header">Tue</div>
+                <div class="text-center py-2 text-sm week-header">Wed</div>
+                <div class="text-center py-2 text-sm week-header">Thu</div>
+                <div class="text-center py-2 text-sm week-header weekend-header">Fri</div>
+                <div class="text-center py-2 text-sm week-header weekend-header">Sat</div>
+            </div>
+            
+            <div id="calendar-days" class="calendar-grid"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
