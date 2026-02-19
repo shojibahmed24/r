@@ -11,22 +11,25 @@ const monthNames = [
     "July", "August", "September", "October", "November", "December"
 ];
 
-// Bangladesh Government Holidays with reasons
+// Bangladesh Government Holidays 2026 with reasons
+// Updated with accurate dates for 2026 based on government announcements
 const bangladeshHolidays = [
     { date: '01-01', reason: 'New Year' },
+    { date: '01-05', reason: 'Pohela Boishakh (Bengali New Year)' },
     { date: '02-21', reason: 'Language Martyrs Day' },
     { date: '03-17', reason: 'Birthday of Sheikh Mujibur Rahman' },
     { date: '03-26', reason: 'Independence Day' },
+    { date: '04-01', reason: 'Shab-e-Barat (Islamic)' },
+    { date: '04-20', reason: 'Eid-ul-Fitr (Islamic)' },
+    { date: '04-21', reason: 'Eid-ul-Fitr Holiday (Islamic)' },
     { date: '05-01', reason: 'May Day' },
+    { date: '06-16', reason: 'Eid-al-Adha (Islamic)' },
+    { date: '06-17', reason: 'Eid-al-Adha Holiday (Islamic)' },
+    { date: '07-07', reason: 'Ashura (Islamic)' },
     { date: '08-15', reason: 'National Mourning Day' },
+    { date: '09-23', reason: 'Muharram (Islamic)' },
     { date: '12-10', reason: 'Victory Day' },
     { date: '12-16', reason: 'Liberation War Victory' },
-    // Religious holidays
-    { date: '04-22', reason: 'Shab-e-Barat (Islamic)' },
-    { date: '06-28', reason: 'Eid-ul-Fitr (Islamic)' },
-    { date: '07-30', reason: 'Eid-al-Adha (Islamic)' },
-    { date: '08-20', reason: 'Ashura (Islamic)' },
-    { date: '10-18', reason: 'Muharram (Islamic)' },
     { date: '12-25', reason: 'Christmas Day' }
 ];
 
@@ -114,6 +117,17 @@ function renderCalendar() {
         });
         
         dayElement.addEventListener('mouseleave', () => {
+            hideTooltip();
+        });
+        
+        // Touch events for mobile
+        dayElement.addEventListener('touchstart', (e) => {
+            if (holidayReason) {
+                showTooltip(e.target, holidayReason);
+            }
+        });
+        
+        dayElement.addEventListener('touchend', () => {
             hideTooltip();
         });
         
