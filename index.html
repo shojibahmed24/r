@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Animated Colorful Calendar</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Calendar – Gifted by Shojib</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -164,6 +164,11 @@
         
         .nav-button {
             transition: all 0.2s ease;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .nav-button:hover {
@@ -226,6 +231,53 @@
             border-color: #1f2937 transparent transparent transparent;
         }
         
+        /* Mobile fullscreen styles */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+        
+        .calendar-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            border-radius: 0;
+        }
+        
+        .calendar-header {
+            padding: 20px 16px;
+        }
+        
+        .calendar-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .calendar-grid {
+            grid-template-columns: repeat(7, 1fr);
+            flex: 1;
+            display: grid;
+        }
+        
+        .calendar-day {
+            aspect-ratio: 1/1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            min-height: 40px;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+        
         /* Responsive adjustments */
         @media (max-width: 640px) {
             .tooltip {
@@ -233,25 +285,111 @@
                 font-size: 12px;
                 padding: 8px 12px;
             }
+            
+            .calendar-day {
+                font-size: 0.9rem;
+            }
+            
+            .calendar-header h2 {
+                font-size: 1.25rem;
+            }
+            
+            .nav-button {
+                width: 36px;
+                height: 36px;
+            }
+        }
+        
+        @media (max-width: 400px) {
+            .calendar-day {
+                font-size: 0.8rem;
+            }
+            
+            .calendar-header {
+                padding: 16px 12px;
+            }
+            
+            .calendar-body {
+                padding: 12px;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .calendar-day {
+                font-size: 1.1rem;
+                min-height: 50px;
+            }
+            
+            .nav-button {
+                width: 44px;
+                height: 44px;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .calendar-day {
+                font-size: 1.2rem;
+                min-height: 60px;
+            }
+            
+            .calendar-container {
+                max-width: 800px;
+                margin: 0 auto;
+                border-radius: 20px;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+                height: 95vh;
+                margin-top: 2.5vh;
+            }
+            
+            .calendar-header {
+                padding: 25px;
+            }
+            
+            .calendar-body {
+                padding: 20px;
+            }
+        }
+        
+        /* Safe area insets for mobile devices with notches */
+        @supports (padding: env(safe-area-inset-top)) {
+            .calendar-header {
+                padding-top: calc(20px + env(safe-area-inset-top));
+                padding-left: calc(16px + env(safe-area-inset-left));
+                padding-right: calc(16px + env(safe-area-inset-right));
+            }
+            
+            .calendar-body {
+                padding-left: calc(16px + env(safe-area-inset-left));
+                padding-right: calc(16px + env(safe-area-inset-right));
+                padding-bottom: calc(16px + env(safe-area-inset-bottom));
+            }
+        }
+        
+        /* Prevent text selection on mobile */
+        .calendar-day {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-indigo-50 to-purple-100 min-h-screen flex items-center justify-center p-4">
-    <div class="max-w-md w-full bg-white rounded-2xl shadow-xl overflow-hidden transition-all duration-300 hover:shadow-2xl">
-        <div class="bg-gradient-to-r from-indigo-500 to-purple-600 p-6 text-white">
-            <h1 class="text-2xl font-bold text-center mb-4">Colorful Calendar</h1>
+<body>
+    <div class="calendar-container bg-gradient-to-br from-indigo-50 to-purple-100 w-full">
+        <div class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white calendar-header">
+            <h1 class="text-2xl font-bold text-center mb-4">Calendar – Gifted by Shojib</h1>
             <div class="flex items-center justify-between">
-                <button id="prev-month" class="nav-button bg-white bg-opacity-20 rounded-full p-2 transition-all duration-200 hover:bg-opacity-30">
+                <button id="prev-month" class="nav-button bg-white bg-opacity-20 rounded-full p-2 transition-all duration-200 hover:bg-opacity-30" aria-label="Previous month">
                     <i class="fas fa-chevron-left"></i>
                 </button>
                 <h2 id="current-month" class="text-xl font-semibold"></h2>
-                <button id="next-month" class="nav-button bg-white bg-opacity-20 rounded-full p-2 transition-all duration-200 hover:bg-opacity-30">
+                <button id="next-month" class="nav-button bg-white bg-opacity-20 rounded-full p-2 transition-all duration-200 hover:bg-opacity-30" aria-label="Next month">
                     <i class="fas fa-chevron-right"></i>
                 </button>
             </div>
         </div>
         
-        <div class="p-6">
+        <div class="calendar-body">
             <div class="grid grid-cols-7 gap-1 mb-2">
                 <div class="text-center py-2 text-sm week-header">Sun</div>
                 <div class="text-center py-2 text-sm week-header">Mon</div>
