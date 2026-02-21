@@ -1,409 +1,419 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Calendar – Gifted by Shojib</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Noor-al-Islam | নূর-আল-ইসলাম</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Amiri:wght@400;700&display=swap');
         
-        @keyframes fadeOut {
-            from { opacity: 1; }
-            to { opacity: 0; }
+        :root {
+            --primary: #064e3b;
+            --primary-light: #059669;
+            --secondary: #d97706;
+            --accent: #f59e0b;
         }
-        
-        @keyframes bounce {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.15); }
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
-            70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
-            100% { transform: scale(1.15); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
-        }
-        
-        @keyframes ripple {
-            0% { transform: scale(0.8); opacity: 1; }
-            100% { transform: scale(1.5); opacity: 0; }
-        }
-        
-        .fade-in {
-            animation: fadeIn 0.4s ease-out forwards;
-        }
-        
-        .fade-out {
-            animation: fadeOut 0.3s ease-out forwards;
-        }
-        
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 1px;
-            transition: opacity 0.3s ease;
-        }
-        
-        .calendar-day {
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
-            overflow: hidden;
-            background: linear-gradient(145deg, #f0f9ff, #e0f2fe);
-            border-radius: 12px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            color: #1e40af;
-            font-weight: 600;
-        }
-        
-        .calendar-day.weekend {
-            background: linear-gradient(145deg, #fef2f2, #fecaca);
-            color: #dc2626;
-            font-weight: 700;
-        }
-        
-        /* Holiday styling */
-        .calendar-day.holiday {
-            background: linear-gradient(145deg, #fee2e2, #fecaca);
-            color: #b91c1c;
-            font-weight: 700;
-            border: 2px solid #ef4444;
-        }
-        
-        /* Weekend + Holiday combination */
-        .calendar-day.weekend.holiday {
-            background: linear-gradient(145deg, #fecaca, #f87171);
-            color: #7f1d1d;
-            border: 2px solid #dc2626;
-        }
-        
-        .calendar-day.prev-month {
-            background: linear-gradient(145deg, #f3f4f6, #e5e7eb);
-            color: #9ca3af;
-        }
-        
-        .calendar-day::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: rgba(59, 130, 246, 0.2);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            transition: width 0.4s, height 0.4s;
-        }
-        
-        .calendar-day:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-            z-index: 10;
-        }
-        
-        .calendar-day.weekend:hover {
-            transform: scale(1.12);
-            box-shadow: 0 6px 12px rgba(220, 38, 38, 0.3);
-        }
-        
-        .calendar-day.holiday:hover {
-            transform: scale(1.12);
-            box-shadow: 0 6px 12px rgba(220, 38, 38, 0.4);
-        }
-        
-        .calendar-day.selected {
-            background: linear-gradient(145deg, #3b82f6, #2563eb);
-            color: white;
-            animation: bounce 0.5s ease;
-            transform: scale(1.15);
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.6);
-            z-index: 20;
-        }
-        
-        .calendar-day.weekend.selected {
-            background: linear-gradient(145deg, #dc2626, #b91c1c);
-            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.6);
-        }
-        
-        .calendar-day.holiday.selected {
-            background: linear-gradient(145deg, #dc2626, #b91c1c);
-            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.6);
-        }
-        
-        .calendar-day.today {
-            background: linear-gradient(145deg, #10b981, #059669);
-            color: white;
-            font-weight: 700;
-            box-shadow: 0 0 0 2px white, 0 0 0 4px #10b981;
-        }
-        
-        .calendar-day.today.selected {
-            background: linear-gradient(145deg, #059669, #047857);
-        }
-        
-        .calendar-day.selected::before {
-            width: 300%;
-            height: 300%;
-        }
-        
-        .calendar-day.clicked::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: rgba(255, 255, 255, 0.5);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            animation: ripple 0.6s ease-out;
-        }
-        
-        .nav-button {
-            transition: all 0.2s ease;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .nav-button:hover {
-            transform: scale(1.15);
-            background-color: rgba(255, 255, 255, 0.3);
-        }
-        
-        .nav-button:active {
-            transform: scale(0.95);
-        }
-        
-        .month-transition {
-            animation: fadeIn 0.5s ease-out;
-        }
-        
-        .week-header {
-            font-weight: 700;
-            color: #4f46e5;
-            text-shadow: 0 1px 1px rgba(0,0,0,0.1);
-        }
-        
-        .weekend-header {
-            color: #dc2626;
-        }
-        
-        /* Enhanced Tooltip styling */
-        .tooltip {
-            position: fixed;
-            z-index: 1000;
-            background: linear-gradient(135deg, #1f2937, #111827);
-            color: white;
-            text-align: center;
-            border-radius: 8px;
-            padding: 10px 16px;
-            font-size: 14px;
-            font-weight: 600;
-            pointer-events: none;
-            white-space: nowrap;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-            opacity: 0;
-            transform: translate(-50%, -10px);
-            transition: opacity 0.3s ease, transform 0.3s ease;
-            max-width: 200px;
-            word-wrap: break-word;
-        }
-        
-        .tooltip.show {
-            opacity: 1;
-            transform: translate(-50%, 0);
-        }
-        
-        .tooltip::after {
-            content: "";
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            margin-left: -6px;
-            border-width: 6px;
-            border-style: solid;
-            border-color: #1f2937 transparent transparent transparent;
-        }
-        
-        /* Mobile fullscreen styles */
+
         html, body {
-            height: 100%;
+            height: 100dvh;
             margin: 0;
             padding: 0;
             overflow: hidden;
-            -webkit-tap-highlight-color: transparent;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
         }
-        
-        .calendar-container {
-            height: 100vh;
+
+        body {
+            font-family: 'Hind Siliguri', sans-serif;
+            background-color: #f1f5f9;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%203d9488' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            color: #0f172a;
             display: flex;
-            flex-direction: column;
-            border-radius: 0;
+            flex-direction: column; /* Stack header, main, nav vertically */
         }
-        
-        .calendar-header {
-            padding: 20px 16px;
+
+        header {
+            flex-shrink: 0;
+            z-index: 50;
         }
-        
-        .calendar-body {
-            flex: 1;
+
+        main {
+            flex: 1; /* Take all available space between header and nav */
             overflow-y: auto;
-            padding: 16px;
+            -webkit-overflow-scrolling: touch;
+            padding: 1rem;
+            scroll-behavior: smooth;
+        }
+
+        nav {
+            flex-shrink: 0; /* Don't shrink the nav */
+            background: white;
+            border-top: 1px solid #e2e8f0;
+            padding: 0.75rem 1rem;
             display: flex;
-            flex-direction: column;
+            justify-content: space-around;
+            z-index: 50;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.05);
         }
-        
-        .calendar-grid {
-            grid-template-columns: repeat(7, 1fr);
-            flex: 1;
-            display: grid;
+
+        .arabic-text {
+            font-family: 'Amiri', serif;
+            direction: rtl;
+            line-height: 2.1;
         }
-        
-        .calendar-day {
-            aspect-ratio: 1/1;
+
+        .glass-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .surah-card:active {
+            transform: scale(0.98);
+            background-color: #f0fdf4;
+        }
+
+        .active-ayah {
+            border-left: 4px solid #10b981 !important;
+            background-color: #f0fdf4 !important;
+            box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.1);
+        }
+
+        .premium-gradient {
+            background: linear-gradient(135deg, #064e3b 0%, #065f46 100%);
+        }
+
+        .premium-card-bg {
+            background: linear-gradient(165deg, #064e3b 0%, #022c22 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-active {
+            color: var(--primary-light) !important;
+            transform: translateY(-2px);
+        }
+
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 1000; }
+        .modal.active { display: flex; }
+
+        .floating-back-btn {
+            position: sticky;
+            top: 0;
+            left: 0;
+            z-index: 45;
+            width: 42px;
+            height: 42px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1rem;
-            min-height: 40px;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
+            color: #065f46;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin-bottom: 1rem;
         }
-        
-        /* Responsive adjustments */
-        @media (max-width: 640px) {
-            .tooltip {
-                max-width: 150px;
-                font-size: 12px;
-                padding: 8px 12px;
-            }
-            
-            .calendar-day {
-                font-size: 0.9rem;
-            }
-            
-            .calendar-header h2 {
-                font-size: 1.25rem;
-            }
-            
-            .nav-button {
-                width: 36px;
-                height: 36px;
-            }
+
+        /* Qibla Compass Styles */
+        .compass-container {
+            position: relative;
+            width: 260px;
+            height: 260px;
+            margin: 0 auto;
         }
-        
-        @media (max-width: 400px) {
-            .calendar-day {
-                font-size: 0.8rem;
-            }
-            
-            .calendar-header {
-                padding: 16px 12px;
-            }
-            
-            .calendar-body {
-                padding: 12px;
-            }
+
+        .compass-ring {
+            position: absolute;
+            inset: 0;
+            border: 8px solid #e2e8f0;
+            border-radius: 50%;
         }
-        
-        @media (min-width: 768px) {
-            .calendar-day {
-                font-size: 1.1rem;
-                min-height: 50px;
-            }
-            
-            .nav-button {
-                width: 44px;
-                height: 44px;
-            }
+
+        .compass-dial {
+            position: absolute;
+            inset: 10px;
+            transition: transform 0.1s ease-out;
         }
-        
-        @media (min-width: 1024px) {
-            .calendar-day {
-                font-size: 1.2rem;
-                min-height: 60px;
-            }
-            
-            .calendar-container {
-                max-width: 800px;
-                margin: 0 auto;
-                border-radius: 20px;
-                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-                height: 95vh;
-                margin-top: 2.5vh;
-            }
-            
-            .calendar-header {
-                padding: 25px;
-            }
-            
-            .calendar-body {
-                padding: 20px;
-            }
+
+        .floating-player-btn {
+            position: fixed;
+            bottom: 100px; /* Positioned above the nav */
+            right: 20px;
+            z-index: 60;
+            width: 50px;
+            height: 50px;
+            background: #064e3b;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 8px 20px rgba(6, 78, 59, 0.3);
         }
-        
-        /* Safe area insets for mobile devices with notches */
-        @supports (padding: env(safe-area-inset-top)) {
-            .calendar-header {
-                padding-top: calc(20px + env(safe-area-inset-top));
-                padding-left: calc(16px + env(safe-area-inset-left));
-                padding-right: calc(16px + env(safe-area-inset-right));
-            }
-            
-            .calendar-body {
-                padding-left: calc(16px + env(safe-area-inset-left));
-                padding-right: calc(16px + env(safe-area-inset-right));
-                padding-bottom: calc(16px + env(safe-area-inset-bottom));
-            }
+
+        .progress-ring {
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            width: 54px;
+            height: 54px;
+            pointer-events: none;
         }
-        
-        /* Prevent text selection on mobile */
-        .calendar-day {
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
+
+        .progress-ring circle {
+            fill: transparent;
+            stroke: #10b981;
+            stroke-width: 3;
+            stroke-dasharray: 157;
+            stroke-dashoffset: 157;
+            transition: stroke-dashoffset 0.3s;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+
+        /* Spacer for bottom of main */
+        .bottom-spacer {
+            height: 20px;
         }
     </style>
 </head>
 <body>
-    <div class="calendar-container bg-gradient-to-br from-indigo-50 to-purple-100 w-full">
-        <div class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white calendar-header">
-            <h1 class="text-2xl font-bold text-center mb-4">Calendar – Gifted by Shojib</h1>
-            <div class="flex items-center justify-between">
-                <button id="prev-month" class="nav-button bg-white bg-opacity-20 rounded-full p-2 transition-all duration-200 hover:bg-opacity-30" aria-label="Previous month">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-                <h2 id="current-month" class="text-xl font-semibold"></h2>
-                <button id="next-month" class="nav-button bg-white bg-opacity-20 rounded-full p-2 transition-all duration-200 hover:bg-opacity-30" aria-label="Next month">
-                    <i class="fas fa-chevron-right"></i>
-                </button>
+
+    <header class="premium-gradient text-white p-4 shadow-xl rounded-b-[25px] flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <div class="bg-white/20 p-2 rounded-xl">
+                <i class="fas fa-star-and-crescent text-lg text-amber-300"></i>
+            </div>
+            <div>
+                <h1 class="text-sm font-bold leading-none">নূর-আল-ইসলাম</h1>
+                <p class="text-[9px] opacity-70">আপনার দ্বীনি সফরসঙ্গী</p>
             </div>
         </div>
+        <div id="user-profile">
+            <button onclick="openAuthModal()" id="login-btn" class="bg-white/10 px-3 py-1.5 rounded-xl text-[10px] font-bold border border-white/20">
+                লগইন
+            </button>
+            <div id="user-info" class="hidden flex items-center gap-2">
+                <div class="text-right">
+                    <p id="user-name" class="text-[10px] font-bold"></p>
+                    <button onclick="handleLogout()" class="text-[9px] text-red-300">লগআউট</button>
+                </div>
+                <div class="w-7 h-7 bg-emerald-500 rounded-full flex items-center justify-center border-2 border-white/30">
+                    <i class="fas fa-user text-[10px]"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main id="app-content" class="max-w-md mx-auto">
         
-        <div class="calendar-body">
-            <div class="grid grid-cols-7 gap-1 mb-2">
-                <div class="text-center py-2 text-sm week-header">Sun</div>
-                <div class="text-center py-2 text-sm week-header">Mon</div>
-                <div class="text-center py-2 text-sm week-header">Tue</div>
-                <div class="text-center py-2 text-sm week-header">Wed</div>
-                <div class="text-center py-2 text-sm week-header">Thu</div>
-                <div class="text-center py-2 text-sm week-header weekend-header">Fri</div>
-                <div class="text-center py-2 text-sm week-header weekend-header">Sat</div>
+        <!-- Home Section -->
+        <section id="home-section" class="space-y-5">
+            <div class="premium-card-bg p-6 rounded-[2rem] text-white shadow-2xl">
+                <div class="flex justify-between items-center mb-6">
+                    <div class="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-full backdrop-blur-md border border-white/10">
+                        <i class="fas fa-calendar-day text-amber-400 text-[10px]"></i>
+                        <span id="ramadan-date" class="text-[9px] font-bold">...</span>
+                    </div>
+                    <div class="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-full backdrop-blur-md border border-white/10">
+                        <i class="fas fa-location-dot text-amber-400 text-[10px]"></i>
+                        <span class="text-[9px] font-bold">ঢাকা</span>
+                    </div>
+                </div>
+
+                <div class="flex flex-col items-center mb-6">
+                    <div class="text-center mb-3">
+                        <p id="next-meal-label" class="text-[10px] font-medium text-emerald-200 uppercase tracking-widest mb-1">ইফতারের বাকি</p>
+                        <h2 id="meal-countdown" class="text-4xl font-black tracking-tighter">00:00:00</h2>
+                    </div>
+                    <div class="w-full max-w-[160px] bg-white/10 h-1.5 rounded-full overflow-hidden">
+                        <div id="fasting-progress" class="h-full bg-gradient-to-r from-amber-400 to-yellow-200 transition-all duration-1000" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-white/5 backdrop-blur-xl p-4 rounded-[1.5rem] border border-white/10 flex flex-col items-center">
+                        <p class="text-[9px] uppercase opacity-60 mb-1">সেহরির শেষ</p>
+                        <p id="sehri-time" class="text-lg font-bold">--:--</p>
+                    </div>
+                    <div class="bg-white/5 backdrop-blur-xl p-4 rounded-[1.5rem] border border-white/10 flex flex-col items-center">
+                        <p class="text-[9px] uppercase opacity-60 mb-1">ইফতারের সময়</p>
+                        <p id="iftar-time" class="text-lg font-bold">--:--</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <div class="glass-card p-6 border-t-4 border-emerald-600">
+                    <h5 class="font-bold text-emerald-800 text-sm mb-3">সেহরির দোয়া</h5>
+                    <p class="arabic-text text-xl text-right mb-3 text-slate-900 font-bold">نَوَيْتُ أَنْ أَصُومَ غَدًا مِّنْ شَهْرِ رَمَضَانَ الْمُبَارَكِ فَرْضًا لَّكَ يَا اللهُ فَتَقَبَّلْ مِنِّي إِنَّكَ أَنْتَ السَّمِيعُ الْعَلِيمُ</p>
+                    <p class="text-[13px] text-slate-700 leading-relaxed">হে আল্লাহ! আগামীকাল পবিত্র রমজান মাসে তোমার পক্ষ থেকে নির্ধারিত ফরজ রোজা রাখার নিয়ত করলাম। অতএব তুমি আমার পক্ষ থেকে তা কবুল কর, নিশ্চয়ই তুমি সর্বশ্রোতা ও সর্বজ্ঞ।</p>
+                </div>
+                <div class="glass-card p-6 border-t-4 border-amber-600">
+                    <h5 class="font-bold text-amber-800 text-sm mb-3">ইফতারের দোয়া</h5>
+                    <p class="arabic-text text-xl text-right mb-3 text-slate-900 font-bold">اَللَّهُمَّ لَكَ صُمْتُ وَعَلَى رِزْقِكَ أَفْطَرْتُ</p>
+                    <p class="text-[13px] text-slate-700 leading-relaxed">হে আল্লাহ! আমি তোমারই সন্তুষ্টির জন্য রোজা রেখেছি এবং তোমারই দেয়া রিযিক দিয়ে ইফতার করছি।</p>
+                </div>
+            </div>
+            <div class="bottom-spacer"></div>
+        </section>
+
+        <!-- Quran Section -->
+        <section id="quran-section" class="hidden space-y-4">
+            <div id="quran-search-container" class="sticky top-0 z-40 bg-slate-50/80 backdrop-blur-md py-2">
+                <input type="text" id="quran-search" oninput="filterSurahs()" placeholder="সূরা খুঁজুন..." 
+                    class="w-full px-5 py-3.5 rounded-2xl border border-slate-200 shadow-sm focus:ring-2 focus:ring-emerald-500 outline-none bg-white text-sm">
             </div>
             
-            <div id="calendar-days" class="calendar-grid"></div>
+            <div id="surah-list" class="grid gap-3"></div>
+
+            <div id="ayah-view" class="hidden space-y-4">
+                <button onclick="backToSurahList()" class="floating-back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div id="ayah-container" class="space-y-4"></div>
+            </div>
+            <div class="bottom-spacer"></div>
+        </section>
+
+        <!-- Qibla Section -->
+        <section id="qibla-section" class="hidden flex flex-col items-center py-6 space-y-6">
+            <div class="text-center">
+                <h2 class="text-xl font-bold text-emerald-900">কিবলা কম্পাস</h2>
+                <p class="text-[11px] text-slate-500 mt-1">সঠিক দিক পেতে ফোনটি সমতলে রাখুন</p>
+            </div>
+
+            <div class="compass-container">
+                <div class="compass-ring"></div>
+                <div id="compass-dial" class="compass-dial">
+                    <svg viewBox="0 0 200 200" class="w-full h-full">
+                        <circle cx="100" cy="100" r="90" fill="white" stroke="#f1f5f9" stroke-width="2" />
+                        <g id="qibla-pointer-group">
+                            <circle cx="100" cy="25" r="12" fill="#d97706" />
+                            <text x="100" y="29" text-anchor="middle" font-size="8" fill="white" font-weight="bold">🕋</text>
+                        </g>
+                        <path d="M100 40 L105 100 L100 110 L95 100 Z" fill="#ef4444" />
+                        <path d="M100 160 L95 100 L100 90 L105 100 Z" fill="#1e293b" />
+                        <circle cx="100" cy="100" r="5" fill="#475569" />
+                    </svg>
+                </div>
+            </div>
+
+            <div class="flex flex-col items-center gap-2">
+                <div id="qibla-status" class="px-4 py-1.5 rounded-full bg-slate-100 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                    কিবলার দিকে ঘুরুন
+                </div>
+                <div class="bg-white shadow-lg border border-slate-100 px-8 py-4 rounded-[2rem] flex items-baseline gap-2">
+                    <span class="text-3xl font-black text-emerald-900" id="qibla-degree">--°</span>
+                    <span class="text-xs font-bold text-slate-400 uppercase">Qibla</span>
+                </div>
+            </div>
+            <div class="bottom-spacer"></div>
+        </section>
+
+        <!-- Tracker Section -->
+        <section id="tracker-section" class="hidden space-y-4">
+            <h2 class="text-xl font-bold text-emerald-900">নামাজ ট্র্যাকার</h2>
+            <div id="monthly-stats-card" class="premium-card-bg p-5 rounded-[1.5rem] text-white shadow-lg hidden">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-2xl font-black" id="total-missed-count">0</p>
+                        <p class="text-[9px] opacity-80">মোট মিস হওয়া নামাজ</p>
+                    </div>
+                    <div class="border-l border-white/10 pl-4">
+                        <p class="text-lg font-bold text-amber-400" id="most-missed-prayer">--</p>
+                        <p class="text-[9px] opacity-80">বেশি মিস হওয়া ওয়াক্ত</p>
+                    </div>
+                </div>
+            </div>
+            <div id="tracker-list" class="space-y-3"></div>
+            <div class="bottom-spacer"></div>
+        </section>
+
+        <!-- Blood Section -->
+        <section id="blood-section" class="hidden space-y-4">
+            <div class="flex justify-between items-center">
+                <h2 class="text-xl font-bold text-emerald-900">রক্তদাতা</h2>
+                <button onclick="openDonorModal()" class="bg-red-500 text-white px-5 py-2.5 rounded-xl text-[11px] font-bold">দাতা হন</button>
+            </div>
+            <select id="blood-filter" onchange="loadDonors()" class="w-full p-3.5 rounded-xl bg-white font-bold outline-none border border-slate-200 shadow-sm text-sm">
+                <option value="">সব গ্রুপ</option>
+                <option value="A+">A+</option><option value="A-">A-</option>
+                <option value="B+">B+</option><option value="B-">B-</option>
+                <option value="O+">O+</option><option value="O-">O-</option>
+                <option value="AB+">AB+</option><option value="AB-">AB-</option>
+            </select>
+            <div id="donor-list" class="space-y-3"></div>
+            <div class="bottom-spacer"></div>
+        </section>
+
+    </main>
+
+    <!-- Minimal Floating Audio Player -->
+    <div id="global-audio-player" class="hidden">
+        <button onclick="toggleAudio()" class="floating-player-btn">
+            <svg class="progress-ring">
+                <circle id="audio-progress-circle" cx="27" cy="27" r="25"></circle>
+            </svg>
+            <i class="fas fa-pause text-sm" id="main-play-pause"></i>
+        </button>
+        <span id="player-surah-name" class="hidden"></span>
+        <span id="audio-time" class="hidden"></span>
+    </div>
+
+    <!-- Nav (Now part of the flex flow, not fixed) -->
+    <nav>
+        <button onclick="showSection('home')" class="nav-btn nav-active flex flex-col items-center text-slate-400" id="nav-home">
+            <i class="fas fa-home text-lg"></i><span class="text-[9px] mt-1 font-bold">হোম</span>
+        </button>
+        <button onclick="showSection('quran')" class="nav-btn flex flex-col items-center text-slate-400" id="nav-quran">
+            <i class="fas fa-book-open text-lg"></i><span class="text-[9px] mt-1 font-bold">কুরআন</span>
+        </button>
+        <button onclick="showSection('qibla')" class="nav-btn flex flex-col items-center text-slate-400" id="nav-qibla">
+            <i class="fas fa-compass text-lg"></i><span class="text-[9px] mt-1 font-bold">কিবলা</span>
+        </button>
+        <button onclick="showSection('tracker')" class="nav-btn flex flex-col items-center text-slate-400" id="nav-tracker">
+            <i class="fas fa-check-circle text-lg"></i><span class="text-[9px] mt-1 font-bold">আমল</span>
+        </button>
+        <button onclick="showSection('blood')" class="nav-btn flex flex-col items-center text-slate-400" id="nav-blood">
+            <i class="fas fa-heart text-lg"></i><span class="text-[9px] mt-1 font-bold">রক্ত</span>
+        </button>
+    </nav>
+
+    <!-- Modals -->
+    <div id="auth-modal" class="modal items-center justify-center p-6">
+        <div class="bg-white p-7 rounded-[2rem] w-full max-w-xs shadow-2xl">
+            <h3 class="text-lg font-bold mb-5 text-emerald-900">লগইন করুন</h3>
+            <input type="email" id="auth-email" placeholder="ইমেইল" class="w-full p-3.5 bg-slate-50 rounded-xl mb-3 outline-none border border-slate-100 text-sm">
+            <input type="password" id="auth-password" placeholder="পাসওয়ার্ড" class="w-full p-3.5 bg-slate-50 rounded-xl mb-5 outline-none border border-slate-100 text-sm">
+            <button onclick="handleAuth()" class="w-full premium-gradient text-white p-3.5 rounded-xl font-bold shadow-lg">প্রবেশ করুন</button>
+            <button onclick="closeAuthModal()" class="w-full mt-4 text-slate-400 text-[11px] font-medium">বন্ধ করুন</button>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <div id="donor-modal" class="modal items-center justify-center p-6">
+        <div class="bg-white p-7 rounded-[2rem] w-full max-w-xs shadow-2xl">
+            <h3 class="text-lg font-bold mb-5 text-red-900">রক্তদাতা নিবন্ধন</h3>
+            <div class="space-y-3">
+                <input type="text" id="donor-name" placeholder="আপনার নাম" class="w-full p-3.5 bg-slate-50 rounded-xl outline-none border border-slate-100 text-sm">
+                <select id="donor-group" class="w-full p-3.5 bg-slate-50 rounded-xl outline-none border border-slate-100 text-sm">
+                    <option value="A+">A+</option><option value="A-">A-</option>
+                    <option value="B+">B+</option><option value="B-">B-</option>
+                    <option value="O+">O+</option><option value="O-">O-</option>
+                    <option value="AB+">AB+</option><option value="AB-">AB-</option>
+                </select>
+                <input type="text" id="donor-location" placeholder="ঠিকানা (শহর)" class="w-full p-3.5 bg-slate-50 rounded-xl outline-none border border-slate-100 text-sm">
+                <input type="tel" id="donor-contact" placeholder="মোবাইল নম্বর" class="w-full p-3.5 bg-slate-50 rounded-xl outline-none border border-slate-100 text-sm">
+            </div>
+            <button onclick="registerDonor()" class="w-full bg-red-600 text-white p-3.5 rounded-xl font-bold mt-5 shadow-lg">নিবন্ধন করুন</button>
+            <button onclick="closeDonorModal()" class="w-full mt-4 text-slate-400 text-[11px] font-medium">বন্ধ করুন</button>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
 </body>
 </html>
