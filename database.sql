@@ -1,0 +1,15 @@
+CREATE TABLE IF NOT EXISTS blood_donors (
+  id BIGSERIAL PRIMARY KEY,
+  name TEXT NOT NULL,
+  blood_group TEXT NOT NULL,
+  location TEXT NOT NULL,
+  contact TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS prayer_logs (
+  id BIGSERIAL PRIMARY KEY,
+  user_id UUID REFERENCES auth.users ON DELETE CASCADE,
+  prayer_name TEXT NOT NULL,
+  date DATE DEFAULT CURRENT_DATE
+);
